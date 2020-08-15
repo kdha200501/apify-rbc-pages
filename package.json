@@ -1,0 +1,16 @@
+{
+  "name": "apify-rbc-pages",
+  "version": "1.0.0",
+  "description": "Convert data from the RBC page to a JSON",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kdha200501@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "keywords": [
+    "RBC",
+    "API"
+  ]
+}
