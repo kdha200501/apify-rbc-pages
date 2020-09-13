@@ -8,6 +8,8 @@
   "author": "kdha200501@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.20",
+    "yargs": "^15.4.1"
   },
   "keywords": [
     "RBC",
