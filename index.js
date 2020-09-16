@@ -2,7 +2,7 @@ const vm = require("vm");
 const { flatten, get } = require("lodash");
 
 // const { getOfferings, getRates } = require("./mock-api/api.js");
-const { getOfferings, getRates } = require("./api/api.js");
+const { getOfferings, getRates } = require("./api/gic/api.js");
 
 function getGic() {
   return Promise.all([getOfferings(), getRates()])

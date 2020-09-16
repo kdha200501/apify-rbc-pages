@@ -7,8 +7,13 @@ const { orderBy, isEqual } = require("lodash");
 const { description } = require("./package.json");
 const argv = require("yargs")
   .usage("Usage: $0 [options]")
-  .command("get-rbc-gic", description)
+  .command("apify-rbc-pages", description)
   .example("$0", "Pipe out the JSON")
+  .alias("p", "page")
+  .nargs("p", 1)
+  .string("p")
+  .describe("p", "Specify which RBC page")
+  .choices("p", ["gic"])
   .alias("l", "log")
   .nargs("l", 0)
   .boolean("l")
@@ -27,16 +32,16 @@ const argv = require("yargs")
   .help("h")
   .alias("h", "help").argv;
 
-function writeGic(gic, path) {
+function writeResponse(response, path) {
   const timestamp = new Date().getTime();
   try {
-    writeFileSync(`${path}/${timestamp}.json`, JSON.stringify(gic));
+    writeFileSync(`${path}/${timestamp}.json`, JSON.stringify(response));
   } catch (err) {
     return err;
   }
 }
 
-function logGic(gic) {
+function logResponse(response) {
   const path = argv.d || process.cwd();
 
   // if the path does not exist
@@ -54,32 +59,45 @@ function logGic(gic) {
 
   // if there is not a previous log
   if (!lastLog) {
-    return writeGic(gic, path);
+    return writeResponse(response, path);
   }
 
   // if there is a previous log
-  let gicLast;
+  let responseLast;
   try {
-    gicLast = JSON.parse(readFileSync(`${path}/${lastLog.name}`));
+    responseLast = JSON.parse(readFileSync(`${path}/${lastLog.name}`));
   } catch (err) {
     return err;
   }
 
   // if the current data is identical to the previous log
-  if (isEqual(orderBy(gicLast, "id"), orderBy(gic, "id"))) {
+  if (isEqual(orderBy(responseLast, "id"), orderBy(response, "id"))) {
     return;
   }
 
   // if the current data is different from the previous log
-  return writeGic(gic, path);
+  return writeResponse(response, path);
 }
 
 const quiet = argv.q === true;
-getGic().then(
-  (gic) => {
-
+const page = argv.p;
+let apiResponse;
+switch (page) {
+  case "gic":
+    apiResponse = getGic();
+    break;
+  default:
     if (!quiet) {
-      console.log(JSON.stringify(gic));
+      console.error("page option must be provided");
+    }
+    process.exit(1);
+    return;
+}
+
+apiResponse.then(
+  (response) => {
+    if (!quiet) {
+      console.log(JSON.stringify(response));
     }
 
     // if skip log
@@ -90,7 +108,7 @@ getGic().then(
     }
 
     // if log
-    const errLog = logGic(gic);
+    const errLog = logResponse(response);
     if (errLog) {
       if (!quiet) {
         console.error(errLog);
