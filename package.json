@@ -4,7 +4,7 @@
   "description": "Convert data from the RBC page to a JSON",
   "main": "index.js",
   "bin": {
-    "get-rbc-gic": "cli.js"
+    "apify-rbc-pages": "cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
