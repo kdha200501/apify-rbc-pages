@@ -2,18 +2,18 @@
 
 "use strict";
 const { readdirSync, existsSync, writeFileSync, readFileSync } = require("fs");
-const { getGic } = require("./index");
+const { getRegisteredGic } = require("./index");
 const { orderBy, isEqual } = require("lodash");
 const { description } = require("./package.json");
 const argv = require("yargs")
   .usage("Usage: $0 [options]")
   .command("apify-rbc-pages", description)
-  .example("$0", "Pipe out the JSON")
+  .example("$0 -p registered-gic", "Pipe out a JSON object for the registered GIC page")
   .alias("p", "page")
   .nargs("p", 1)
   .string("p")
   .describe("p", "Specify which RBC page")
-  .choices("p", ["gic"])
+  .choices("p", ["registered-gic"])
   .alias("l", "log")
   .nargs("l", 0)
   .boolean("l")
@@ -83,8 +83,8 @@ const quiet = argv.q === true;
 const page = argv.p;
 let apiResponse;
 switch (page) {
-  case "gic":
-    apiResponse = getGic();
+  case "registered-gic":
+    apiResponse = getRegisteredGic();
     break;
   default:
     if (!quiet) {

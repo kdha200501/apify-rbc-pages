@@ -1,11 +1,14 @@
 const vm = require("vm");
 const { flatten, get } = require("lodash");
 
-// const { getOfferings, getRates } = require("./mock-api/api.js");
-const { getOfferings, getRates } = require("./api/gic/api.js");
+// const registeredGicApi = require("./mock-api/registered-gic/api.js");
+const registeredGicApi = require("./api/registered-gic/api.js");
 
-function getGic() {
-  return Promise.all([getOfferings(), getRates()])
+function getRegisteredGic() {
+  return Promise.all([
+    registeredGicApi.getOfferings(),
+    registeredGicApi.getRates(),
+  ])
     .then(([offeringsString, ratesString]) => {
       // "rates" response is a Json (in plain text)
       const rates = JSON.parse(ratesString);
@@ -15,7 +18,15 @@ function getGic() {
       const script = new vm.Script(offeringsString);
       vm.createContext(context);
       script.runInContext(context);
-      const offerings = flatten(Object.values(Object.values(context)[0]));
+
+      const offerings = flatten(
+        Object.entries(Object.values(context)[0]).map(([term, val]) =>
+          val.map((offering) => ({
+            ...offering,
+            term,
+          }))
+        )
+      );
 
       return {
         rates,
@@ -36,5 +47,5 @@ function getGic() {
 }
 
 module.exports = {
-  getGic,
+  getRegisteredGic,
 };
