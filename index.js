@@ -4,8 +4,6 @@ const { flatten, get } = require("lodash");
 // const registeredGicApi = require("./mock-api/registered-gic/api.js");
 const registeredGicApi = require("./api/registered-gic/api.js");
 
-// TODO: get term label
-
 function getRegisteredGic() {
   return Promise.all([
     registeredGicApi.getOfferings(),
@@ -20,7 +18,15 @@ function getRegisteredGic() {
       const script = new vm.Script(offeringsString);
       vm.createContext(context);
       script.runInContext(context);
-      const offerings = flatten(Object.values(Object.values(context)[0]));
+
+      const offerings = flatten(
+        Object.entries(Object.values(context)[0]).map(([term, val]) =>
+          val.map((offering) => ({
+            ...offering,
+            term,
+          }))
+        )
+      );
 
       return {
         rates,
