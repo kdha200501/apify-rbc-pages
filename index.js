@@ -1,11 +1,16 @@
 const vm = require("vm");
 const { flatten, get } = require("lodash");
 
-// const { getOfferings, getRates } = require("./mock-api/api.js");
-const { getOfferings, getRates } = require("./api/gic/api.js");
+// const registeredGicApi = require("./mock-api/registered-gic/api.js");
+const registeredGicApi = require("./api/registered-gic/api.js");
 
-function getGic() {
-  return Promise.all([getOfferings(), getRates()])
+// TODO: get term label
+
+function getRegisteredGic() {
+  return Promise.all([
+    registeredGicApi.getOfferings(),
+    registeredGicApi.getRates(),
+  ])
     .then(([offeringsString, ratesString]) => {
       // "rates" response is a Json (in plain text)
       const rates = JSON.parse(ratesString);
@@ -36,5 +41,5 @@ function getGic() {
 }
 
 module.exports = {
-  getGic,
+  getRegisteredGic,
 };

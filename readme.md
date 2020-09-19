@@ -11,13 +11,13 @@ $ npm i --save express apify-rbc-pages
 ```
 
 ```javascript
-const { getGic } = require("apify-rbc-pages");
+const { getRegisteredGic } = require("apify-rbc-pages");
 const express = require("express");
 
 const app = express();
 const port = 3000;
 
-app.get("/gic", (_, res) => getGic().then((gic) => res.json(gic)));
+app.get("/registered-gic", (_, res) => getRegisteredGic().then((registeredGic) => res.json(registeredGic)));
 
 app.listen(port, () =>
   console.log(`Example app listening at http://localhost:${port}`)
@@ -36,7 +36,7 @@ Commands:
 
 Options:
   --version        Show version number                                 [boolean]
-  -p, --page       Specify which RBC page              [string] [choices: "gic"]
+  -p, --page       Specify which RBC page   [string] [choices: "registered-gic"]
   -l, --log        Save the JSON if content is different from the last [boolean]
   -q, --quiet      Do not output to stdout or stderr                   [boolean]
   -d, --directory  Specify the directory where the log is to be saved, defaults
@@ -44,6 +44,6 @@ Options:
   -h, --help       Show help                                           [boolean]
 
 Examples:
-  apify-rbc-pages  Pipe out the JSON
+  apify-rbc-pages -p registered-gic  Pipe out a JSON object for the registered
 
 ```
