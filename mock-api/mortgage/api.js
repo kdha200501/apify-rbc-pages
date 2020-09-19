@@ -1,28 +1,16 @@
-const { readFile } = require("fs");
 const { join } = require("path");
-
-function _readMockFromFile(filename) {
-  return new Promise((resolve, reject) => {
-    readFile(join(__dirname, filename), "utf8", (err, data) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(data);
-    });
-  });
-}
+const { readMockFile } = require("../../utils");
 
 function getMortgageFixed() {
-  return _readMockFromFile("fixed.html");
+  return readMockFile(join(__dirname, "fixed.html"));
 }
 
 function getMortgagePrime() {
-  return _readMockFromFile("prime.html");
+  return readMockFile(join(__dirname, "prime.html"));
 }
 
 function getMortgageVariable() {
-  return _readMockFromFile("variable.html");
+  return readMockFile(join(__dirname, "variable.html"));
 }
 
 module.exports = {

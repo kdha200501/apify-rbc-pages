@@ -11,13 +11,29 @@ $ npm i --save express apify-rbc-pages
 ```
 
 ```javascript
-const { getRegisteredGic } = require("apify-rbc-pages");
+const {
+  getRegisteredGic,
+  getMortgageFixed,
+  getMortgagePrime,
+  getMortgageVariable,
+} = require("apify-rbc-pages");
 const express = require("express");
 
 const app = express();
 const port = 3000;
 
-app.get("/registered-gic", (_, res) => getRegisteredGic().then((registeredGic) => res.json(registeredGic)));
+app.get("/registered-gic", (_, res) =>
+  getRegisteredGic().then((apifyRes) => res.json(apifyRes))
+);
+app.get("/mortgage-fixed", (_, res) =>
+  getMortgageFixed().then((apifyRes) => res.json(apifyRes))
+);
+app.get("/mortgage-prime", (_, res) =>
+  getMortgagePrime().then((apifyRes) => res.json(apifyRes))
+);
+app.get("/mortgage-variable", (_, res) =>
+  getMortgageVariable().then((apifyRes) => res.json(apifyRes))
+);
 
 app.listen(port, () =>
   console.log(`Example app listening at http://localhost:${port}`)
@@ -36,7 +52,9 @@ Commands:
 
 Options:
   --version        Show version number                                 [boolean]
-  -p, --page       Specify which RBC page   [string] [choices: "registered-gic"]
+  -p, --page       Specify which RBC page
+        [string] [choices: "registered-gic", "mortgage-fixed", "mortgage-prime",
+                                                            "mortgage-variable"]
   -l, --log        Save the JSON if content is different from the last [boolean]
   -q, --quiet      Do not output to stdout or stderr                   [boolean]
   -d, --directory  Specify the directory where the log is to be saved, defaults
@@ -45,5 +63,5 @@ Options:
 
 Examples:
   apify-rbc-pages -p registered-gic  Pipe out a JSON object for the registered
-
+                                     GIC page
 ```

@@ -2,18 +2,31 @@
 
 "use strict";
 const { readdirSync, existsSync, writeFileSync, readFileSync } = require("fs");
-const { getRegisteredGic } = require("./index");
+const {
+  getRegisteredGic,
+  getMortgageFixed,
+  getMortgagePrime,
+  getMortgageVariable,
+} = require("./index");
 const { orderBy, isEqual } = require("lodash");
 const { description } = require("./package.json");
 const argv = require("yargs")
   .usage("Usage: $0 [options]")
   .command("apify-rbc-pages", description)
-  .example("$0 -p registered-gic", "Pipe out a JSON object for the registered GIC page")
+  .example(
+    "$0 -p registered-gic",
+    "Pipe out a JSON object for the registered GIC page"
+  )
   .alias("p", "page")
   .nargs("p", 1)
   .string("p")
   .describe("p", "Specify which RBC page")
-  .choices("p", ["registered-gic"])
+  .choices("p", [
+    "registered-gic",
+    "mortgage-fixed",
+    "mortgage-prime",
+    "mortgage-variable",
+  ])
   .alias("l", "log")
   .nargs("l", 0)
   .boolean("l")
@@ -85,6 +98,15 @@ let apiResponse;
 switch (page) {
   case "registered-gic":
     apiResponse = getRegisteredGic();
+    break;
+  case "mortgage-fixed":
+    apiResponse = getMortgageFixed();
+    break;
+  case "mortgage-prime":
+    apiResponse = getMortgagePrime();
+    break;
+  case "mortgage-variable":
+    apiResponse = getMortgageVariable();
     break;
   default:
     if (!quiet) {
