@@ -1,16 +1,16 @@
-const { join } = require("path");
-const { readMockFile } = require("../../utils");
+const { join } = require('path');
+const { readMockFile } = require('../../utils');
 
 function getMortgageFixed() {
-  return readMockFile(join(__dirname, "fixed.html"));
+  return readMockFile(join(__dirname, 'fixed.html'));
 }
 
 function getMortgagePrime() {
-  return readMockFile(join(__dirname, "prime.html"));
+  return readMockFile(join(__dirname, 'prime.html'));
 }
 
 function getMortgageVariable() {
-  return readMockFile(join(__dirname, "variable.html"));
+  return readMockFile(join(__dirname, 'variable.html'));
 }
 
 module.exports = {

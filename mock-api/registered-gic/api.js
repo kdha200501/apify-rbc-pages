@@ -1,13 +1,13 @@
-const { join } = require("path");
+const { join } = require('path');
 
-const { readMockFile } = require("../../utils");
+const { readMockFile } = require('../../utils');
 
 function getOfferings() {
-  return readMockFile(join(__dirname, "ri.js"));
+  return readMockFile(join(__dirname, 'ri.js'));
 }
 
 function getRates() {
-  return readMockFile(join(__dirname, "response.json"));
+  return readMockFile(join(__dirname, 'response.json'));
 }
 
 module.exports = {
