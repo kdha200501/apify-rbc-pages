@@ -1,13 +1,13 @@
-const vm = require("vm");
-const { flatten, get } = require("lodash");
-const { load, html } = require("cheerio");
+const vm = require('vm');
+const { flatten, get } = require('lodash');
+const { load, html } = require('cheerio');
 
 // const registeredGicApi = require("./mock-api/registered-gic/api.js");
-const registeredGicApi = require("./api/registered-gic/api.js");
+const registeredGicApi = require('./api/registered-gic/api.js');
 // const mortgageApi = require("./mock-api/mortgage/api");
-const mortgageApi = require("./api/mortgage/api");
+const mortgageApi = require('./api/mortgage/api');
 
-const { extractTable, convertTableToJson } = require("./utils");
+const { extractTable, convertTableToJson } = require('./utils');
 
 function getRegisteredGic() {
   return Promise.all([
@@ -39,8 +39,8 @@ function getRegisteredGic() {
       };
     })
     .then(({ rates, offerings }) => {
-      const offeringRateMap = get(rates, "result_content").reduce(
-        (acc, rate) => acc.set(get(rate, "Name"), rate),
+      const offeringRateMap = get(rates, 'result_content').reduce(
+        (acc, rate) => acc.set(get(rate, 'Name'), rate),
         new Map()
       );
 
@@ -55,7 +55,7 @@ function getMortgageFixed() {
   return mortgageApi
     .getMortgageFixed()
     .then(load)
-    .then(($) => Array.from($("table")).pop())
+    .then(($) => Array.from($('table')).pop())
     .then(html)
     .then(load)
     .then(extractTable)
@@ -66,7 +66,7 @@ function getMortgagePrime() {
   return mortgageApi
     .getMortgagePrime()
     .then(load)
-    .then(($) => Array.from($("#rbc-prime-rate table")).pop())
+    .then(($) => Array.from($('#rbc-prime-rate table')).pop())
     .then(html)
     .then(load)
     .then(extractTable)
@@ -77,7 +77,7 @@ function getMortgageVariable() {
   return mortgageApi
     .getMortgageVariable()
     .then(load)
-    .then(($) => Array.from($("table")).shift())
+    .then(($) => Array.from($('table')).shift())
     .then(html)
     .then(load)
     .then(extractTable)

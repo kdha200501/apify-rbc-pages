@@ -1,49 +1,49 @@
 #!/usr/bin/env node
 
-"use strict";
-const { readdirSync, existsSync, writeFileSync, readFileSync } = require("fs");
+'use strict';
+const { readdirSync, existsSync, writeFileSync, readFileSync } = require('fs');
 const {
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,
   getMortgageVariable,
-} = require("./index");
-const { orderBy, isEqual } = require("lodash");
-const { description } = require("./package.json");
-const argv = require("yargs")
-  .usage("Usage: $0 [options]")
-  .command("apify-rbc-pages", description)
+} = require('./index');
+const { orderBy, isEqual } = require('lodash');
+const { description } = require('./package.json');
+const argv = require('yargs')
+  .usage('Usage: $0 [options]')
+  .command('apify-rbc-pages', description)
   .example(
-    "$0 -p registered-gic",
-    "Pipe out a JSON object for the registered GIC page"
+    '$0 -p registered-gic',
+    'Pipe out a JSON object for the registered GIC page'
   )
-  .alias("p", "page")
-  .nargs("p", 1)
-  .string("p")
-  .describe("p", "Specify which RBC page")
-  .choices("p", [
-    "registered-gic",
-    "mortgage-fixed",
-    "mortgage-prime",
-    "mortgage-variable",
+  .alias('p', 'page')
+  .nargs('p', 1)
+  .string('p')
+  .describe('p', 'Specify which RBC page')
+  .choices('p', [
+    'registered-gic',
+    'mortgage-fixed',
+    'mortgage-prime',
+    'mortgage-variable',
   ])
-  .alias("l", "log")
-  .nargs("l", 0)
-  .boolean("l")
-  .describe("l", "Save the JSON if content is different from the last")
-  .alias("d", "directory")
-  .nargs("d", 1)
-  .string("d")
-  .alias("q", "quiet")
-  .nargs("q", 0)
-  .boolean("q")
-  .describe("q", "Do not output to stdout or stderr")
+  .alias('l', 'log')
+  .nargs('l', 0)
+  .boolean('l')
+  .describe('l', 'Save the JSON if content is different from the last')
+  .alias('d', 'directory')
+  .nargs('d', 1)
+  .string('d')
+  .alias('q', 'quiet')
+  .nargs('q', 0)
+  .boolean('q')
+  .describe('q', 'Do not output to stdout or stderr')
   .describe(
-    "d",
-    "Specify the directory where the log is to be saved, defaults to cwd"
+    'd',
+    'Specify the directory where the log is to be saved, defaults to cwd'
   )
-  .help("h")
-  .alias("h", "help").argv;
+  .help('h')
+  .alias('h', 'help').argv;
 
 function writeResponse(response, path) {
   const timestamp = new Date().getTime();
@@ -66,8 +66,8 @@ function logResponse(response) {
     readdirSync(path, { withFileTypes: true }).filter(({ name }) =>
       /.*.json/i.test(name)
     ),
-    ["name"],
-    ["desc"]
+    ['name'],
+    ['desc']
   );
 
   // if there is not a previous log
@@ -84,7 +84,7 @@ function logResponse(response) {
   }
 
   // if the current data is identical to the previous log
-  if (isEqual(orderBy(responseLast, "id"), orderBy(response, "id"))) {
+  if (isEqual(orderBy(responseLast, 'id'), orderBy(response, 'id'))) {
     return;
   }
 
@@ -96,21 +96,21 @@ const quiet = argv.q === true;
 const page = argv.p;
 let apiResponse;
 switch (page) {
-  case "registered-gic":
+  case 'registered-gic':
     apiResponse = getRegisteredGic();
     break;
-  case "mortgage-fixed":
+  case 'mortgage-fixed':
     apiResponse = getMortgageFixed();
     break;
-  case "mortgage-prime":
+  case 'mortgage-prime':
     apiResponse = getMortgagePrime();
     break;
-  case "mortgage-variable":
+  case 'mortgage-variable':
     apiResponse = getMortgageVariable();
     break;
   default:
     if (!quiet) {
-      console.error("page option must be provided");
+      console.error('page option must be provided');
     }
     process.exit(1);
     return;
