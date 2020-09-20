@@ -3,6 +3,7 @@
 'use strict';
 const { readdirSync, existsSync, writeFileSync, readFileSync } = require('fs');
 const {
+  getGicApi,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,
@@ -22,6 +23,7 @@ const argv = require('yargs')
   .string('p')
   .describe('p', 'Specify which RBC page')
   .choices('p', [
+    'gic',
     'registered-gic',
     'mortgage-fixed',
     'mortgage-prime',
@@ -96,6 +98,9 @@ const quiet = argv.q === true;
 const page = argv.p;
 let apiResponse;
 switch (page) {
+  case 'gic':
+    apiResponse = getGicApi();
+    break;
   case 'registered-gic':
     apiResponse = getRegisteredGic();
     break;
