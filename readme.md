@@ -1,6 +1,6 @@
 ## Description
 
-Convert data from the RBC page to a JSON
+Convert data on the RBC page of choice to a JSON
 
 ## Usage with _Express_
 
