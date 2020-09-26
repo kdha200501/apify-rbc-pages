@@ -1,6 +1,6 @@
 {
   "name": "apify-rbc-pages",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Convert data on the RBC page of choice to a JSON",
   "main": "index.js",
   "bin": {
