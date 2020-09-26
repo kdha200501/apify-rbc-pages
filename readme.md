@@ -12,7 +12,7 @@ $ npm i --save express apify-rbc-pages
 
 ```javascript
 const {
-  getGicApi,
+  getGic,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,
@@ -24,7 +24,7 @@ const app = express();
 const port = 3000;
 
 app.get("/gic", (_, res) =>
-  getGicApi().then((apifyRes) => res.json(apifyRes))
+  getGic().then((apifyRes) => res.json(apifyRes))
 );
 app.get("/registered-gic", (_, res) =>
   getRegisteredGic().then((apifyRes) => res.json(apifyRes))

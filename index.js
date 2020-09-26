@@ -9,9 +9,9 @@ const registeredGicApi = require('./api/registered-gic/api.js');
 // const mortgageApi = require("./mock-api/mortgage/api");
 const mortgageApi = require('./api/mortgage/api');
 
-const { extractTable, convertTableToJson } = require('./utils');
+const { extractTable, convert2DimensionalMatrixToJson } = require('./utils');
 
-function getGicApi() {
+function getGic() {
   return (
     gicApi
       .getGic()
@@ -25,7 +25,7 @@ function getGicApi() {
         ['Term Group', ...keys],
         ...valuesList,
       ])
-      .then(convertTableToJson)
+      .then(convert2DimensionalMatrixToJson)
   );
 }
 
@@ -79,7 +79,7 @@ function getMortgageFixed() {
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 function getMortgagePrime() {
@@ -90,7 +90,7 @@ function getMortgagePrime() {
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 function getMortgageVariable() {
@@ -101,11 +101,11 @@ function getMortgageVariable() {
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 module.exports = {
-  getGicApi,
+  getGic,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,

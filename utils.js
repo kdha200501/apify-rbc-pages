@@ -119,7 +119,7 @@ function extractTable($) {
   return [keyCells, ...chunk(valueCells, keyCells.length)];
 }
 
-function convertTableToJson([keys, ...valuesList]) {
+function convert2DimensionalMatrixToJson([keys, ...valuesList]) {
   return sortBy(
     valuesList.map((values) => zipObject(keys, values)),
     keys.slice(0, 1)
@@ -130,5 +130,5 @@ module.exports = {
   readMockFile,
   fetch,
   extractTable,
-  convertTableToJson,
+  convert2DimensionalMatrixToJson,
 };

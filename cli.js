@@ -3,7 +3,7 @@
 'use strict';
 const { readdirSync, existsSync, writeFileSync, readFileSync } = require('fs');
 const {
-  getGicApi,
+  getGic,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,
@@ -99,7 +99,7 @@ const page = argv.p;
 let apiResponse;
 switch (page) {
   case 'gic':
-    apiResponse = getGicApi();
+    apiResponse = getGic();
     break;
   case 'registered-gic':
     apiResponse = getRegisteredGic();
