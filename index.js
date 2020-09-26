@@ -2,12 +2,32 @@ const vm = require('vm');
 const { flatten, get } = require('lodash');
 const { load, html } = require('cheerio');
 
+// const gicApi = require('./mock-api/gic/api');
+const gicApi = require('./api/gic/api');
 // const registeredGicApi = require("./mock-api/registered-gic/api.js");
 const registeredGicApi = require('./api/registered-gic/api.js');
 // const mortgageApi = require("./mock-api/mortgage/api");
 const mortgageApi = require('./api/mortgage/api');
 
-const { extractTable, convertTableToJson } = require('./utils');
+const { extractTable, convert2DimensionalMatrixToJson } = require('./utils');
+
+function getGic() {
+  return (
+    gicApi
+      .getGic()
+      .then(load)
+      .then(($) => $('table#gic-rates-table'))
+      .then(html)
+      .then(load)
+      .then(extractTable)
+      // eslint-disable-next-line no-unused-vars
+      .then(([[_, ...keys], ...valuesList]) => [
+        ['Term Group', ...keys],
+        ...valuesList,
+      ])
+      .then(convert2DimensionalMatrixToJson)
+  );
+}
 
 function getRegisteredGic() {
   return Promise.all([
@@ -59,18 +79,18 @@ function getMortgageFixed() {
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 function getMortgagePrime() {
   return mortgageApi
     .getMortgagePrime()
     .then(load)
-    .then(($) => Array.from($('#rbc-prime-rate table')).pop())
+    .then(($) => $('#rbc-prime-rate table'))
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 function getMortgageVariable() {
@@ -81,10 +101,11 @@ function getMortgageVariable() {
     .then(html)
     .then(load)
     .then(extractTable)
-    .then(convertTableToJson);
+    .then(convert2DimensionalMatrixToJson);
 }
 
 module.exports = {
+  getGic,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,

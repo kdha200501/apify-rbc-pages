@@ -12,6 +12,7 @@ $ npm i --save express apify-rbc-pages
 
 ```javascript
 const {
+  getGic,
   getRegisteredGic,
   getMortgageFixed,
   getMortgagePrime,
@@ -22,6 +23,9 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
+app.get("/gic", (_, res) =>
+  getGic().then((apifyRes) => res.json(apifyRes))
+);
 app.get("/registered-gic", (_, res) =>
   getRegisteredGic().then((apifyRes) => res.json(apifyRes))
 );
@@ -48,13 +52,14 @@ $ apify-rbc-pages -h
 Usage: apify-rbc-pages [options]
 
 Commands:
-  apify-rbc-pages apify-rbc-pages  Convert data from the RBC page to a JSON
+  apify-rbc-pages apify-rbc-pages  Convert data on the RBC page of choice to a
+                                   JSON
 
 Options:
   --version        Show version number                                 [boolean]
   -p, --page       Specify which RBC page
-        [string] [choices: "registered-gic", "mortgage-fixed", "mortgage-prime",
-                                                            "mortgage-variable"]
+                   [string] [choices: "gic", "registered-gic", "mortgage-fixed",
+                                          "mortgage-prime", "mortgage-variable"]
   -l, --log        Save the JSON if content is different from the last [boolean]
   -q, --quiet      Do not output to stdout or stderr                   [boolean]
   -d, --directory  Specify the directory where the log is to be saved, defaults
