@@ -2,6 +2,7 @@
 
 'use strict';
 const { readdirSync, existsSync, writeFileSync, readFileSync } = require('fs');
+const { join } = require('path');
 const {
   getGic,
   getRegisteredGic,
@@ -50,7 +51,7 @@ const argv = require('yargs')
 function writeResponse(response, path) {
   const timestamp = new Date().getTime();
   try {
-    writeFileSync(`${path}/${timestamp}.json`, JSON.stringify(response));
+    writeFileSync(join(path, `${timestamp}.json`), JSON.stringify(response));
   } catch (err) {
     return err;
   }
@@ -80,7 +81,7 @@ function logResponse(response) {
   // if there is a previous log
   let responseLast;
   try {
-    responseLast = JSON.parse(readFileSync(`${path}/${lastLog.name}`));
+    responseLast = JSON.parse(readFileSync(join(path, lastLog.name)));
   } catch (err) {
     return err;
   }
