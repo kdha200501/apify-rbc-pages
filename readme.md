@@ -60,7 +60,9 @@ Options:
   -p, --page       Specify which RBC page
                    [string] [choices: "gic", "registered-gic", "mortgage-fixed",
                                           "mortgage-prime", "mortgage-variable"]
-  -l, --log        Save the JSON if content is different from the last [boolean]
+  -l, --log        Save the JSON if content is different from the last, upcoming
+                   feature: plots data points on a line chart see example
+                   https://codepen.io/kdha200501/full/dyOWOEL          [boolean]
   -q, --quiet      Do not output to stdout or stderr                   [boolean]
   -d, --directory  Specify the directory where the log is to be saved, defaults
                    to cwd                                               [string]
