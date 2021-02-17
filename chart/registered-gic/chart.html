@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body,
+      .legend-container {
+        display: flex;
+        flex-direction: column;
+      }
+      #chart + .legend-container {
+        margin-top: 50px;
+      }
+      .legend-title {
+        font-size: 12px;
+        font-family: Roboto;
+      }
+      .legend-title + .legend {
+        margin-top: 12px;
+      }
+      .legend {
+        display: flex;
+        align-content: center;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        padding-left: 10px;
+      }
+      .legend.focused {
+        background-color: #ffd440;
+      }
+      .legend + .legend {
+        margin-top: 12px;
+      }
+      label {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 12px;
+        font-family: Roboto;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      label.disabled {
+        text-decoration: line-through;
+        pointer-events: none;
+      }
+      input[type='checkbox'] {
+        display: none;
+      }
+      .legend-color {
+        height: 24px;
+        width: 24px;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      label.disabled ~ .legend-color {
+        background-color: rgba(0, 0, 0, 0) !important;
+        border: 2px dotted gray;
+        box-sizing: border-box;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="text/javascript" src="dataTable.js"></script>
+  </head>
+  <body>
+    <div id="chart"></div>
+    <div class="legend-container">
+      <section class="legend-title">filter</section>
+    </div>
+    <script type="text/javascript">
+      const allColors = [
+        '#3366CC',
+        '#DC3912',
+        '#FF9900',
+        '#109618',
+        '#990099',
+        '#3B3EAC',
+        '#0099C6',
+        '#DD4477',
+        '#66AA00',
+        '#B82E2E',
+        '#316395',
+        '#994499',
+        '#22AA99',
+        '#AAAA11',
+        '#6633CC',
+        '#E67300',
+        '#8B0707',
+        '#329262',
+        '#5574A6',
+        '#3B3EAC',
+      ];
+      const columnColors = Array.from(dataTableColumns.slice(1)).map(
+        (_, idx) => allColors[idx % allColors.length]
+      );
+      // initial legend select state
+      const showMap = new Map(
+        Array.from(dataTableColumns.slice(1)).map((_, idx) => [idx, true])
+      );
+
+      function drawLegends(chart, dataTable, classicOptions) {
+        const legends = dataTableColumns.slice(1).map(([_, title]) => title);
+
+        const legendContainerElement = document.querySelector(
+          '.legend-container'
+        );
+        legends.forEach((legend, idx) => {
+          const legendElement = document.createElement('section');
+          legendElement.className = 'legend';
+          legendContainerElement.appendChild(legendElement);
+
+          const labelElement = document.createElement('label');
+          labelElement.setAttribute('for', 'legend_' + idx);
+          labelElement.appendChild(document.createTextNode(legend));
+          labelElement.onclick = () => {
+            // update legend
+            [...document.querySelectorAll('.legend')].forEach((targetElement) =>
+              targetElement.classList.remove('focused')
+            );
+            legendElement.classList.add('focused');
+            // update chart
+            const skip = [...showMap].filter(
+              ([_idx, show]) => _idx < idx && !show
+            ).length;
+            chart.setSelection([
+              { row: dataTable.getNumberOfRows() - 1, column: idx + 1 - skip },
+            ]);
+            document
+              .querySelector('#chart')
+              .scrollIntoView({ behavior: 'smooth', block: 'center' });
+          };
+          legendElement.appendChild(labelElement);
+
+          const checkboxElement = document.createElement('input');
+          checkboxElement.setAttribute('type', 'checkbox');
+          checkboxElement.setAttribute('id', 'legend_' + idx);
+          checkboxElement.setAttribute('name', 'legend_' + idx);
+          checkboxElement.setAttribute('value', `${idx}`);
+          legendElement.appendChild(checkboxElement);
+
+          const colorElement = document.createElement('div');
+          colorElement.className = 'legend-color';
+          colorElement.style.backgroundColor = columnColors[idx];
+          colorElement.onclick = () => {
+            [...document.querySelectorAll('.legend')].forEach((targetElement) =>
+              targetElement.classList.remove('focused')
+            );
+            const show = !showMap.get(idx);
+            if (!show && [...showMap].filter(([_, show]) => show).length < 2) {
+              return;
+            }
+            showMap.set(idx, show);
+            document.querySelector(
+              `label[for="legend_${idx}"]`
+            ).className = showMap.get(idx) ? '' : 'disabled';
+            updateLineChart(chart, dataTable, classicOptions);
+          };
+          legendElement.appendChild(colorElement);
+        });
+      }
+
+      function createDataTable({ DataTable }) {
+        const dataTable = new DataTable();
+        dataTableColumns.forEach(([type, title]) =>
+          dataTable.addColumn(type, title)
+        );
+        dataTableRows.forEach((row) => {
+          dataTable.addRow(
+            row.map((col, idx) => {
+              const [type] = dataTableColumns[idx];
+              switch (type) {
+                case 'date':
+                  return new Date(col);
+                default:
+                  return col;
+              }
+            })
+          );
+        });
+
+        return dataTable;
+      }
+
+      function drawLineChart() {
+        google.charts.load('current', { packages: ['line'] });
+        return new Promise((resolve) =>
+          google.charts.setOnLoadCallback(() => {
+            const dataTable = createDataTable(google.visualization);
+            const classicOptions = {
+              chart: {
+                title,
+                subtitle,
+              },
+              vAxis: {
+                viewWindow: {
+                  min: 0,
+                },
+              },
+              colors: columnColors,
+              legend: { position: 'none' },
+              height: 400,
+            };
+            const chart = new google.charts.Line(
+              document.getElementById('chart')
+            );
+            chart.draw(
+              dataTable,
+              google.charts.Line.convertOptions(classicOptions)
+            );
+
+            resolve([chart, dataTable, classicOptions]);
+          })
+        );
+      }
+
+      function updateLineChart(chart, dataTable, classicOptions) {
+        const view = new google.visualization.DataView(dataTable);
+        const hideColumns = [...showMap.entries()]
+          .filter(([_, show]) => !show)
+          .map(([idx]) => idx);
+        view.hideColumns(hideColumns.map((idx) => idx + 1));
+        const colors = [...columnColors];
+        hideColumns.reverse().forEach((idx) => colors.splice(idx, 1));
+        chart.draw(
+          view,
+          google.charts.Line.convertOptions({ ...classicOptions, colors })
+        );
+      }
+
+      function scrollToLegend(chart) {
+        [...document.querySelectorAll('.legend')].forEach((targetElement) =>
+          targetElement.classList.remove('focused')
+        );
+
+        const [cell] = chart.getSelection();
+        const { column } = cell || {}; // a column refers to a line
+
+        // if click on chart background
+        if (!column) {
+          return;
+        }
+
+        const targetElement = document.querySelector(
+          `label[for=legend_${column - 1}]`
+        ).parentElement;
+        targetElement.classList.add('focused');
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      drawLineChart().then(([chart, dataTable, classicOptions]) => {
+        setTimeout(() => window.scrollTo(0, 0), 0);
+        window.onresize = () =>
+          updateLineChart(chart, dataTable, classicOptions);
+        // there's bug with Google Charts - chart.setSelection([{row, column}]) fires a 'select' event
+        // google.visualization.events.addListener(chart, "select", () =>
+        //   scrollToLegend(chart)
+        // );
+        drawLegends(chart, dataTable, classicOptions);
+      });
+    </script>
+  </body>
+</html>

@@ -10,6 +10,7 @@ const {
   getMortgagePrime,
   getMortgageVariable,
 } = require('./index');
+const { tabulateRegisteredGic } = require('./chart/registered-gic/tabulate');
 const { orderBy, isEqual } = require('lodash');
 const { description } = require('./package.json');
 const argv = require('yargs')
@@ -33,7 +34,10 @@ const argv = require('yargs')
   .alias('l', 'log')
   .nargs('l', 0)
   .boolean('l')
-  .describe('l', 'Save the JSON if content is different from the last')
+  .describe(
+    'l',
+    'Save the JSON if content is different from the last, upcoming feature: plots data points on a line chart see example https://codepen.io/kdha200501/full/dyOWOEL'
+  )
   .alias('d', 'directory')
   .nargs('d', 1)
   .string('d')
@@ -48,25 +52,47 @@ const argv = require('yargs')
   .help('h')
   .alias('h', 'help').argv;
 
-function writeResponse(response, path) {
+function writeResponse(response, writePath) {
   const timestamp = new Date().getTime();
   try {
-    writeFileSync(join(path, `${timestamp}.json`), JSON.stringify(response));
+    writeFileSync(
+      join(writePath, `${timestamp}.json`),
+      JSON.stringify(response)
+    );
   } catch (err) {
     return err;
   }
 }
 
+function tabulateLogs(override) {
+  const cwd = argv.d || process.cwd();
+  const filename = 'dataTable.js';
+
+  try {
+    if (existsSync(join(cwd, filename)) && !override) {
+      return;
+    }
+  } catch (err) {
+    return err;
+  }
+
+  switch (argv.p) {
+    case 'registered-gic':
+      return tabulateRegisteredGic(cwd, filename);
+    default:
+  }
+}
+
 function logResponse(response) {
-  const path = argv.d || process.cwd();
+  const cwd = argv.d || process.cwd();
 
   // if the path does not exist
-  if (!existsSync(path)) {
-    return new Error(`Directory "${path}" does not exist.`);
+  if (!existsSync(cwd)) {
+    return new Error(`Directory "${cwd}" does not exist.`);
   }
 
   const [lastLog] = orderBy(
-    readdirSync(path, { withFileTypes: true }).filter(({ name }) =>
+    readdirSync(cwd, { withFileTypes: true }).filter(({ name }) =>
       /.*.json/i.test(name)
     ),
     ['name'],
@@ -75,30 +101,29 @@ function logResponse(response) {
 
   // if there is not a previous log
   if (!lastLog) {
-    return writeResponse(response, path);
+    return writeResponse(response, cwd) || tabulateLogs();
   }
 
   // if there is a previous log
   let responseLast;
   try {
-    responseLast = JSON.parse(readFileSync(join(path, lastLog.name)));
+    responseLast = JSON.parse(readFileSync(join(cwd, lastLog.name)));
   } catch (err) {
     return err;
   }
 
   // if the current data is identical to the previous log
   if (isEqual(orderBy(responseLast, 'id'), orderBy(response, 'id'))) {
-    return;
+    return tabulateLogs();
   }
 
   // if the current data is different from the previous log
-  return writeResponse(response, path);
+  return writeResponse(response, cwd) || tabulateLogs(true);
 }
 
 const quiet = argv.q === true;
-const page = argv.p;
 let apiResponse;
-switch (page) {
+switch (argv.p) {
   case 'gic':
     apiResponse = getGic();
     break;
@@ -116,7 +141,7 @@ switch (page) {
     break;
   default:
     if (!quiet) {
-      console.error('page option must be provided');
+      console.error(`page "${argv.p}" is not supported`);
     }
     process.exit(1);
     return;
@@ -128,8 +153,9 @@ apiResponse.then(
       console.log(JSON.stringify(response));
     }
 
-    // if skip log
     const doLog = argv.l === true;
+
+    // if skip log
     if (!doLog) {
       process.exit(0);
       return;
