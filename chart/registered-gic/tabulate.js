@@ -4,7 +4,7 @@ const {
   writeFileSync,
   copyFileSync,
 } = require('fs');
-const { join } = require('path');
+const { join, dirname } = require('path');
 
 function listJsonFiles(readPath) {
   return readdirSync(readPath, {
@@ -119,7 +119,10 @@ function tabulateRegisteredGic(cwd, filename) {
 
   // provide presentation layer
   try {
-    copyFileSync(join(__dirname, 'chart.html'), join(cwd, 'chart.html'));
+    copyFileSync(
+      join(dirname(__dirname), 'chart.html'),
+      join(cwd, 'chart.html')
+    );
   } catch (err) {
     return err;
   }
