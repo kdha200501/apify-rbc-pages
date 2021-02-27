@@ -252,10 +252,22 @@
         setTimeout(() => window.scrollTo(0, 0), 0);
         window.onresize = () =>
           updateLineChart(chart, dataTable, classicOptions);
-        // there's bug with Google Charts - chart.setSelection([{row, column}]) fires a 'select' event
-        // google.visualization.events.addListener(chart, "select", () =>
-        //   scrollToLegend(chart)
-        // );
+        google.visualization.events.addListener(chart, 'select', () => {
+          const [{ row, column }] = chart.getSelection() || {};
+
+          if (!column) {
+            return;
+          }
+
+          // if user clicks on a dot, OR
+          // chart.setSelection([{row, column}]) fires a 'select' event, which is an API bug
+          if (row !== null && row !== undefined) {
+            return;
+          }
+
+          // if the user clicks on the line
+          scrollToLegend(chart);
+        });
         drawLegends(chart, dataTable, classicOptions);
       });
     </script>
