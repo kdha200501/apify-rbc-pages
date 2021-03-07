@@ -12,6 +12,7 @@ const {
 } = require('./index');
 const { tabulateRegisteredGic } = require('./chart/registered-gic/tabulate');
 const { tabulateGic } = require('./chart/gic/tabulate');
+const { tabulateMortgageFixed } = require('./chart/mortgage-fixed/tabulate');
 const { orderBy, isEqual } = require('lodash');
 const { description } = require('./package.json');
 const argv = require('yargs')
@@ -82,6 +83,8 @@ function tabulateLogs(override) {
       return tabulateGic(cwd, filename);
     case 'registered-gic':
       return tabulateRegisteredGic(cwd, filename);
+    case 'mortgage-fixed':
+      return tabulateMortgageFixed(cwd, filename);
     default:
   }
 }
