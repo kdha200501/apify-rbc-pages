@@ -1,6 +1,6 @@
 const { readFile } = require('fs');
 const https = require('https');
-const { load, html } = require('cheerio');
+const { load } = require('cheerio');
 const { chunk, zipObject, sortBy, times, constant } = require('lodash');
 
 const { regexpNewLine } = require('./const');
@@ -33,8 +33,8 @@ function fetch(url) {
   });
 }
 
-function loadAsXml(_html) {
-  return load(_html, {
+function loadAsXml(html) {
+  return load(html, {
     xmlMode: true,
   });
 }
@@ -88,7 +88,6 @@ function extractTable($) {
   const keyCells = Array.from(
     $(hasThead ? 'thead th' : 'tr:first-of-type td, tr:first-of-type th')
   )
-    .map(html)
     .map(load)
     .map((_$) => _$.text().replace(regexpNewLine, '').trim());
 
@@ -103,7 +102,6 @@ function extractTable($) {
         : 'tr:not(:first-of-type) td, tr:not(:first-of-type) th'
     )
   )
-    .map(html)
     .map(loadAsXml)
     .map(extractCellSpan);
 
@@ -131,4 +129,5 @@ module.exports = {
   fetch,
   extractTable,
   convert2DimensionalMatrixToJson,
+  loadAsXml,
 };
