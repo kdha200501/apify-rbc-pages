@@ -1,6 +1,5 @@
 const vm = require('vm');
 const { flatten, get } = require('lodash');
-const { load, html } = require('cheerio');
 
 // const gicApi = require('./mock-api/gic/api');
 const gicApi = require('./api/gic/api');
@@ -9,16 +8,19 @@ const registeredGicApi = require('./api/registered-gic/api.js');
 // const mortgageApi = require("./mock-api/mortgage/api");
 const mortgageApi = require('./api/mortgage/api');
 
-const { extractTable, convert2DimensionalMatrixToJson } = require('./utils');
+const {
+  extractTable,
+  convert2DimensionalMatrixToJson,
+  loadAsXml,
+} = require('./utils');
 
 function getGic() {
   return (
     gicApi
       .getGic()
-      .then(load)
+      .then(loadAsXml)
       .then(($) => $('table#gic-rates-table'))
-      .then(html)
-      .then(load)
+      .then(loadAsXml)
       .then(extractTable)
       // eslint-disable-next-line no-unused-vars
       .then(([[_, ...keys], ...valuesList]) => [
@@ -74,10 +76,12 @@ function getRegisteredGic() {
 function getMortgageFixed() {
   return mortgageApi
     .getMortgageFixed()
-    .then(load)
-    .then(($) => Array.from($('table')).pop())
-    .then(html)
-    .then(load)
+    .then(loadAsXml)
+    .then(($) => {
+      const [$table] = Array.from($('table'));
+      return $table;
+    })
+    .then(loadAsXml)
     .then(extractTable)
     .then(convert2DimensionalMatrixToJson);
 }
@@ -85,10 +89,9 @@ function getMortgageFixed() {
 function getMortgagePrime() {
   return mortgageApi
     .getMortgagePrime()
-    .then(load)
-    .then(($) => $('#rbc-prime-rate table'))
-    .then(html)
-    .then(load)
+    .then(loadAsXml)
+    .then(($) => $('#rbc-prime-rate table').html())
+    .then(loadAsXml)
     .then(extractTable)
     .then(convert2DimensionalMatrixToJson);
 }
@@ -96,10 +99,12 @@ function getMortgagePrime() {
 function getMortgageVariable() {
   return mortgageApi
     .getMortgageVariable()
-    .then(load)
-    .then(($) => Array.from($('table')).shift())
-    .then(html)
-    .then(load)
+    .then(loadAsXml)
+    .then(($) => {
+      const [$table] = Array.from($('table'));
+      return $table;
+    })
+    .then(loadAsXml)
     .then(extractTable)
     .then(convert2DimensionalMatrixToJson);
 }
